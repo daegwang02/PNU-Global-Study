@@ -117,10 +117,15 @@ class CareerScraper:
         # 실제 RSS URL로 교체하세요
         rss_sources = {
             "jobs": [
-                "https://www.saramin.co.kr/zf_user/help/live/rss",
+                "https://www.saramin.co.kr/zf_user/help/live/rss",         # 사람인 
+                "https://rss.incruit.com/list/TodayNew.asp",        # 인크루트 
+                "http://rss.campusmon.com/rss/newrecruit.asp"       # 캠퍼스몬 
             ],
             "contests": [
-                "https://www.wevity.com/index_rss.php",
+                "https://www.wevity.com/index_rss.php",              # 위비티 
+                "https://www.thinkcontest.com/rss/rss_thinkcontest.xml", # 씽유 
+                "https://www.campus-pick.com/api/v1/contest/rss",   # 캠퍼스픽 
+                "https://www.all-con.co.kr/rss/allcontest.xml"      # 올콘 
             ]
         }
         
