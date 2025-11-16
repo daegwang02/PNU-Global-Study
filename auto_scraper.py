@@ -9,6 +9,14 @@ from datetime import datetime, timedelta
 import feedparser
 import re
 from typing import List, Dict
+import os  # 👈 [수정 1] os 모듈 추가
+
+# --- 경로 설정 ---
+# 이 스크립트 파일(auto_scraper.py)이 있는 디렉토리
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# 데이터 파일 경로 (한 단계 상위 폴더, 즉 프로젝트 루트)
+DATA_FILE = os.path.join(BASE_DIR, '..', 'data.json')
+# ---------------
 
 class CareerScraper:
     def __init__(self):
@@ -72,7 +80,8 @@ class CareerScraper:
     def load_existing_data(self) -> Dict:
         """기존 데이터 로드"""
         try:
-            with open('data.json', 'r', encoding='utf-8') as f:
+            # 👈 [수정 2] data.json 경로 수정
+            with open(DATA_FILE, 'r', encoding='utf-8') as f:
                 return json.load(f)
         except FileNotFoundError:
             return {"lastUpdated": "", "jobs": [], "contests": []}
@@ -222,10 +231,11 @@ class CareerScraper:
         """데이터 저장"""
         self.data['lastUpdated'] = datetime.now().isoformat()
         
-        with open('data.json', 'w', encoding='utf-8') as f:
+        # 👈 [수정 3] data.json 경로 수정
+        with open(DATA_FILE, 'w', encoding='utf-8') as f:
             json.dump(self.data, f, ensure_ascii=False, indent=2)
         
-        print(f"\n💾 저장 완료!")
+        print(f"\n💾 저장 완료! (경로: {DATA_FILE})")
         print(f"📊 채용: {len(self.data['jobs'])}건")
         print(f"🏆 공모전: {len(self.data['contests'])}건")
         print(f"🆕 신규: {self.new_items_count}건")
