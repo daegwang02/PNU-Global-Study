@@ -99,7 +99,7 @@ Vercel 자동 재배포
 ## 📞 문의
 
 - **GitHub**: [Issues](https://github.com/YOUR_ID/pnu-career-hub/issues)
-- **Email**: your@email.com
+- **Email**: gadongpyo02@naver.com
 
 ---
 
