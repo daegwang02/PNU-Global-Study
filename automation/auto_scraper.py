@@ -264,13 +264,13 @@
 """
 자동 데이터 수집기
 RSS 피드 + 공식 API를 통한 자동 수집
-(v_PNU - 버그 수정 최종본)
+(v_PNU_fix - 접속 문제 및 버그 수정 최종본)
 """
 
 import json
 import requests
 from datetime import datetime, timedelta
-import feedparser
+import feedparser  # 👈 feedparser만 import
 import re
 from typing import List, Dict
 import os
@@ -279,6 +279,9 @@ import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, '..', 'data.json')
 # ---------------
+
+# 👈 [추가!] 봇 차단을 피하기 위한 '신분증' (User-Agent)
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 
 class CareerScraper:
     def __init__(self):
@@ -330,17 +333,17 @@ class CareerScraper:
         
         rss_sources = {
             "jobs": [
-                "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?robot=Y&mCode=MN098&type=rss", # 부산대 채용
-                "https://www.saramin.co.kr/zf_user/help/live/rss",         # 사람인
-                "https://rss.incruit.com/list/TodayNew.asp",        # 인크루트
-                "http://rss.campusmon.com/rss/newrecruit.asp"       # 캠퍼스몬
+                "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?robot=Y&mCode=MN098&type=rss", 
+                "https://www.saramin.co.kr/zf_user/help/live/rss",
+                "https://rss.incruit.com/list/TodayNew.asp",
+                "https://rss.campusmon.com/rss/newrecruit.asp"  # 👈 [수정] http -> https
             ],
             "contests": [
-                "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?robot=Y&mCode=MN099&type=rss", # 부산대 공모전
-                "https://www.wevity.com/index_rss.php",              # 위비티
-                "https://www.thinkcontest.com/rss/rss_thinkcontest.xml", # 씽유
-                "https://www.campus-pick.com/api/v1/contest/rss",   # 캠퍼스픽
-                "https://www.all-con.co.kr/rss/allcontest.xml"      # 올콘
+                "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?robot=Y&mCode=MN099&type=rss",
+                "https://www.wevity.com/index_rss.php",
+                "https://www.thinkcontest.com/rss/rss_thinkcontest.xml",
+                "https://www.campus-pick.com/api/v1/contest/rss",
+                "https://www.all-con.co.kr/rss/allcontest.xml"
             ]
         }
         
@@ -349,7 +352,14 @@ class CareerScraper:
                 print(f"  > [채용] {feed_url} 확인 중...")
                 is_pnu_feed = "pusan.ac.kr" in feed_url
                 
-                feed = feedparser.parse(feed_url)
+                # 👈 [수정!] '사람인 척' 접속
+                feed = feedparser.parse(feed_url, agent=USER_AGENT)
+                
+                if feed.bozo: # 👈 [추가!] feedparser가 파싱에 실패했는지 확인
+                    print(f"    ⚠️ 경고: {feed_url} 파싱 실패. (bozo=1)")
+                    print(f"    {feed.bozo_exception}")
+                    continue # 실패하면 이 URL은 건너뜀
+
                 for entry in feed.entries[:20]:
                     title = entry.get('title', '')
                     description = entry.get('summary', '')
@@ -386,7 +396,14 @@ class CareerScraper:
                 print(f"  > [공모전] {feed_url} 확인 중...")
                 is_pnu_feed = "pusan.ac.kr" in feed_url
                 
-                feed = feedparser.parse(feed_url)
+                # 👈 [수정!] '사람인 척' 접속
+                feed = feedparser.parse(feed_url, agent=USER_AGENT)
+
+                if feed.bozo: # 👈 [추가!] feedparser가 파싱에 실패했는지 확인
+                    print(f"    ⚠️ 경고: {feed_url} 파싱 실패. (bozo=1)")
+                    print(f"    {feed.bozo_exception}")
+                    continue # 실패하면 이 URL은 건너뜀
+                
                 for entry in feed.entries[:20]:
                     title = entry.get('title', '')
                     description = entry.get('summary', '')
@@ -480,7 +497,7 @@ class CareerScraper:
 
 def main():
     print("=" * 50)
-    print("🤖 자동 데이터 수집 시작 (v_PNU_fix)")
+    print("🤖 자동 데이터 수집 시작 (v_PNU_fix_v3)")
     print("=" * 50)
     
     scraper = CareerScraper()
