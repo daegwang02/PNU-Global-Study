@@ -263,14 +263,13 @@
 
 """
 자동 데이터 수집기
-RSS 피드 + 공식 API를 통한 자동 수집
-(v_PNU_fix - 접속 문제 및 버그 수정 최종본)
+(v_PNU_fix_v4 - requests 라이브러리로 접속 문제 해결)
 """
 
 import json
-import requests
+import requests  # 👈 [추가!] requests 라이브러리
 from datetime import datetime, timedelta
-import feedparser  # 👈 feedparser만 import
+import feedparser
 import re
 from typing import List, Dict
 import os
@@ -282,6 +281,8 @@ DATA_FILE = os.path.join(BASE_DIR, '..', 'data.json')
 
 # 👈 [추가!] 봇 차단을 피하기 위한 '신분증' (User-Agent)
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+# 👈 [추가!] requests 헤더
+HEADERS = {'User-Agent': USER_AGENT}
 
 class CareerScraper:
     def __init__(self):
@@ -336,7 +337,7 @@ class CareerScraper:
                 "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?robot=Y&mCode=MN098&type=rss", 
                 "https://www.saramin.co.kr/zf_user/help/live/rss",
                 "https://rss.incruit.com/list/TodayNew.asp",
-                "https://rss.campusmon.com/rss/newrecruit.asp"  # 👈 [수정] http -> https
+                "https://rss.campusmon.com/rss/newrecruit.asp"
             ],
             "contests": [
                 "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?robot=Y&mCode=MN099&type=rss",
@@ -352,13 +353,17 @@ class CareerScraper:
                 print(f"  > [채용] {feed_url} 확인 중...")
                 is_pnu_feed = "pusan.ac.kr" in feed_url
                 
-                # 👈 [수정!] '사람인 척' 접속
-                feed = feedparser.parse(feed_url, agent=USER_AGENT)
+                # 👈 [수정!] requests로 먼저 접속
+                response = requests.get(feed_url, headers=HEADERS, timeout=10)
+                response.raise_for_status() # 4xx, 5xx 에러가 나면 여기서 멈춤
                 
-                if feed.bozo: # 👈 [추가!] feedparser가 파싱에 실패했는지 확인
+                # 👈 [수정!] 다운받은 텍스트(content)를 feedparser에게 전달
+                feed = feedparser.parse(response.content)
+                
+                if feed.bozo:
                     print(f"    ⚠️ 경고: {feed_url} 파싱 실패. (bozo=1)")
                     print(f"    {feed.bozo_exception}")
-                    continue # 실패하면 이 URL은 건너뜀
+                    continue
 
                 for entry in feed.entries[:20]:
                     title = entry.get('title', '')
@@ -389,20 +394,24 @@ class CareerScraper:
                         self.new_items_count += 1
                         print(f"    ✅ 새 채용: {title[:30]}...")
             except Exception as e:
-                print(f"    ❌ RSS 오류 ({feed_url}): {e}")
+                print(f"    ❌ RSS/HTTP 오류 ({feed_url}): {e}") # 👈 [수정] 오류 문구
         
         for feed_url in rss_sources["contests"]:
             try:
                 print(f"  > [공모전] {feed_url} 확인 중...")
                 is_pnu_feed = "pusan.ac.kr" in feed_url
                 
-                # 👈 [수정!] '사람인 척' 접속
-                feed = feedparser.parse(feed_url, agent=USER_AGENT)
+                # 👈 [수정!] requests로 먼저 접속
+                response = requests.get(feed_url, headers=HEADERS, timeout=10)
+                response.raise_for_status()
+                
+                # 👈 [수정!] 다운받은 텍스트(content)를 feedparser에게 전달
+                feed = feedparser.parse(response.content)
 
-                if feed.bozo: # 👈 [추가!] feedparser가 파싱에 실패했는지 확인
+                if feed.bozo:
                     print(f"    ⚠️ 경고: {feed_url} 파싱 실패. (bozo=1)")
                     print(f"    {feed.bozo_exception}")
-                    continue # 실패하면 이 URL은 건너뜀
+                    continue
                 
                 for entry in feed.entries[:20]:
                     title = entry.get('title', '')
@@ -434,7 +443,7 @@ class CareerScraper:
                         self.new_items_count += 1
                         print(f"    ✅ 새 공모전: {title[:30]}...")
             except Exception as e:
-                print(f"    ❌ RSS 오류 ({feed_url}): {e}")
+                print(f"    ❌ RSS/HTTP 오류 ({feed_url}): {e}") # 👈 [수정] 오류 문구
     
     def extract_deadline(self, entry) -> str:
         """마감일 추출 (임시로 30일)"""
@@ -497,7 +506,7 @@ class CareerScraper:
 
 def main():
     print("=" * 50)
-    print("🤖 자동 데이터 수집 시작 (v_PNU_fix_v3)")
+    print("🤖 자동 데이터 수집 시작 (v_PNU_fix_v4)")
     print("=" * 50)
     
     scraper = CareerScraper()
