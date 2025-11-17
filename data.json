@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2025-11-15T00:00:00Z",
+  "lastUpdated": "2025-11-17T02:56:56.772583",
   "jobs": [
     {
       "id": 1,
@@ -9,7 +9,11 @@
       "type": "채용",
       "deadline": "2025-11-30",
       "url": "https://example.com/job1",
-      "tags": ["인턴", "무역", "서울"],
+      "tags": [
+        "인턴",
+        "무역",
+        "서울"
+      ],
       "new": true
     },
     {
@@ -20,7 +24,11 @@
       "type": "채용",
       "deadline": "2025-12-15",
       "url": "https://example.com/job2",
-      "tags": ["5급", "공무원", "외교"],
+      "tags": [
+        "5급",
+        "공무원",
+        "외교"
+      ],
       "new": true
     },
     {
@@ -31,7 +39,11 @@
       "type": "채용",
       "deadline": "2025-11-25",
       "url": "https://example.com/job3",
-      "tags": ["금융", "은행", "신입"],
+      "tags": [
+        "금융",
+        "은행",
+        "신입"
+      ],
       "new": false
     }
   ],
@@ -45,7 +57,11 @@
       "deadline": "2025-12-01",
       "prize": "대상 500만원",
       "url": "https://example.com/contest1",
-      "tags": ["공모전", "무역", "아이디어"],
+      "tags": [
+        "공모전",
+        "무역",
+        "아이디어"
+      ],
       "new": true
     },
     {
@@ -57,7 +73,10 @@
       "deadline": "2025-11-28",
       "prize": "대상 300만원",
       "url": "https://example.com/contest2",
-      "tags": ["공모전", "경제정책"],
+      "tags": [
+        "공모전",
+        "경제정책"
+      ],
       "new": true
     },
     {
@@ -69,7 +88,10 @@
       "deadline": "2025-12-10",
       "prize": "대상 200만원",
       "url": "https://example.com/contest3",
-      "tags": ["에세이", "국제관계"],
+      "tags": [
+        "에세이",
+        "국제관계"
+      ],
       "new": false
     }
   ]
