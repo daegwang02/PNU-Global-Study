@@ -71,7 +71,7 @@ def scrape_saramin():
 # -------------------------------
 def scrape_incruit():
     print("[JOB] Scraping Incruit...")
-    url = "https://www.job.incruit.com/entry/"
+    url = "https://m.incruit.com/entry/"  # 올바른 인증서 도메인
     resp = requests.get(url)
     soup = BeautifulSoup(resp.text, "lxml")
     
