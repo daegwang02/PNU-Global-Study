@@ -282,7 +282,6 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, '..', 'data.json')
 # ---------------
 
-HEADERS = get_random_headers()
 
 # 👈 [추가!] 봇 차단을 피하기 위한 다양한 '신분증' (User-Agent)
 USER_AGENTS = [
@@ -301,6 +300,9 @@ def get_random_headers():
         'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
         'Referer': 'https://www.google.com/'
     }
+
+HEADERS = get_random_headers()
+
 
 class CareerScraper:
     def __init__(self):
