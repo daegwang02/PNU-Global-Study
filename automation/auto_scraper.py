@@ -1,60 +1,130 @@
 import json
-import datetime
-from html_scraper import scrape_saramin, scrape_incruit, scrape_jobkorea, scrape_wevity, scrape_campuspick
+import random
+import time
+import requests
+from bs4 import BeautifulSoup
+from datetime import datetime
 
-DATA_FILE = "data.json"
+# -----------------------------------
+# 랜덤 User-Agent 생성
+# -----------------------------------
+def get_random_headers():
+    user_agents = [
+        # Chrome
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115 Safari/537.36",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14 Safari/605.1.15",
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110 Safari/537.36",
+        # Mobile
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15 Mobile Safari/604.1",
+        "Mozilla/5.0 (Linux; Android 11) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103 Mobile Safari/537.36",
+    ]
+    return {"User-Agent": random.choice(user_agents)}
 
-def load_data():
-    try:
-        with open(DATA_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except:
-        return {"lastUpdated": None, "jobs": [], "contests": []}
 
-def save_data(data):
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+# -----------------------------------
+# 안전한 요청 (Retry 포함)
+# -----------------------------------
+def safe_request(url, retries=3, delay=1):
+    for attempt in range(retries):
+        try:
+            res = requests.get(url, headers=get_random_headers(), timeout=10)
+            if res.status_code == 200:
+                return res
+        except Exception:
+            time.sleep(delay)
+    return None
 
-def main():
-    print("==================================================")
-    print("📡 HTML 기반 스크래핑 시작!")
 
-    data = load_data()
+# -----------------------------------
+# 링크 리스트 (취준 + 공모전)
+# -----------------------------------
+JOB_LINKS = [
+    "https://www.saramin.co.kr/zf_user/jobs/hot100",
+    "https://job.incruit.com/entry/",
+    "https://www.jobkorea.co.kr/theme/entry-level-internship",
+]
 
-    all_jobs = []
-    all_contests = []
+CONTEST_LINKS = [
+    "https://www.wevity.com/?c=find",
+    "https://www.campuspick.com/contest",
+]
 
-    # 🧹 기존 데이터 제거 (항상 최신 목록으로 유지)
-    print("🧹 기존 데이터 초기화")
 
-    # 📌 각 사이트에서 데이터 수집
-    print("🔎 사람인 채용 수집 중...")
-    all_jobs += scrape_saramin()
+# -----------------------------------
+# 공고 파싱 함수 (사이트 공통용)
+# -----------------------------------
+def parse_job_list(url):
+    results = []
+    res = safe_request(url)
+    if not res:
+        print(f"[ERROR] Failed to fetch: {url}")
+        return results
 
-    print("🔎 인크루트 채용 수집 중...")
-    all_jobs += scrape_incruit()
+    soup = BeautifulSoup(res.text, "html.parser")
 
-    print("🔎 잡코리아 채용 수집 중...")
-    all_jobs += scrape_jobkorea()
+    # 매우 단순한 범용 파서 (모든 사이트 호환)
+    items = soup.find_all(["a", "div"], limit=25)
 
-    print("🔎 위비티 공모전 수집 중...")
-    all_contests += scrape_wevity()
+    for item in items:
+        title = (item.text or "").strip().replace("\n", " ")
+        if len(title) < 5:
+            continue
 
-    print("🔎 캠퍼스픽 공모전 수집 중...")
-    all_contests += scrape_campuspick()
+        href = item.get("href")
+        if href and href.startswith("/"):
+            href = url.split("/")[0] + "//" + url.split("/")[2] + href
 
-    # 🔄 JSON 업데이트
-    data["lastUpdated"] = datetime.datetime.now().isoformat()
-    data["jobs"] = all_jobs
-    data["contests"] = all_contests
+        if not href or "javascript" in href:
+            continue
 
-    save_data(data)
+        results.append({"title": title, "url": href})
 
-    print("✅ 완료! data.json 업데이트됨.")
-    print(f"   - 채용: {len(all_jobs)}개")
-    print(f"   - 공모전: {len(all_contests)}개")
+    return results
 
+
+# -----------------------------------
+# 전체 수집
+# -----------------------------------
+def scrape_all():
+    final_data = {"jobs": [], "contests": []}
+
+    for url in JOB_LINKS:
+        print(f"[JOB] Scraping: {url}")
+        final_data["jobs"].extend(parse_job_list(url))
+        time.sleep(1)
+
+    for url in CONTEST_LINKS:
+        print(f"[CONTEST] Scraping: {url}")
+        final_data["contests"].extend(parse_job_list(url))
+        time.sleep(1)
+
+    return final_data
+
+
+# -----------------------------------
+# 저장
+# -----------------------------------
+def save_to_json(data):
+    output = {
+        "lastUpdated": datetime.now().isoformat(),
+        "jobs": data["jobs"],
+        "contests": data["contests"]
+    }
+
+    with open("data.json", "w", encoding="utf-8") as f:
+        json.dump(output, f, ensure_ascii=False, indent=2)
+
+    print("[SAVE] data.json updated")
+
+
+# -----------------------------------
+# 메인 실행
+# -----------------------------------
 if __name__ == "__main__":
-    main()
+    print("=== Auto Scraper Started ===")
+    data = scrape_all()
+    save_to_json(data)
+    print("=== Done ===")
+
 
 
