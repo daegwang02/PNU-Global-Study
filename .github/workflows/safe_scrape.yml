@@ -1,37 +1,29 @@
-name: Auto Update (Safe Mode)
+name: Safe Scraper Workflow
 
 on:
   schedule:
-    - cron: "0 0 * * *"   # 매일 09:00 KST
+    - cron: '0 0 * * *'  # 매일 09:00 한국시간
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
-  run-scraper:
+  scrape:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v3
-
+      - uses: actions/checkout@v3
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
-
-      - name: Install Dependencies
-        run: pip install -r automation/requirements.txt
-
-      - name: Run Scraper
-        run: python automation/auto_scraper.py
-
-      - name: Commit Changes
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          pip install -r automation/requirements.txt
+      - name: Run scraper
+        run: |
+          python automation/auto_scraper.py
+      - name: Commit & Push
         run: |
           git config --local user.name "github-actions"
-          git config --local user.email "actions@github.com"
+          git config --local user.email "github-actions@github.com"
           git add data.json
-          git commit -m "Auto update: $(date)" || echo "No changes"
+          git commit -m "Auto update data.json [skip ci]" || echo "No changes"
           git push
-
