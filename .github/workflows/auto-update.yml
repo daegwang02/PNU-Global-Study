@@ -1,41 +1,37 @@
-name: Auto Update Data
-
-# ⬇️ [중요] 이 부분이 반드시 있어야 권한 에러가 안 납니다!
-permissions:
-  contents: write
+name: Auto Update (Safe Mode)
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # 매일 한국시간 오전 9시 (UTC 0시)
-  workflow_dispatch:  # 수동 실행 가능
+    - cron: "0 0 * * *"   # 매일 09:00 KST
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
-  update:
+  run-scraper:
     runs-on: ubuntu-latest
-    
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
-      
-      - name: Install dependencies
+          python-version: "3.11"
+
+      - name: Install Dependencies
+        run: pip install -r automation/requirements.txt
+
+      - name: Run Scraper
+        run: python automation/auto_scraper.py
+
+      - name: Commit Changes
         run: |
-          pip install -r automation/requirements.txt
-      
-      - name: Run scraper
-        run: |
-          # automation 폴더 안의 스크립트를 실행합니다.
-          python automation/auto_scraper.py
-      
-      - name: Commit changes
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.name "github-actions"
+          git config --local user.email "actions@github.com"
           git add data.json
-          # 변경사항이 있는지 확인하고, 있다면 커밋 & 푸시
-          git diff --quiet && git diff --staged --quiet || \
-          (git commit -m "🤖 Auto update: $(date +'%Y-%m-%d %H:%M KST')" && git push)
+          git commit -m "Auto update: $(date)" || echo "No changes"
+          git push
+
