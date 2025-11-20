@@ -282,6 +282,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, '..', 'data.json')
 # ---------------
 
+HEADERS = get_random_headers()
+
 # 👈 [추가!] 봇 차단을 피하기 위한 다양한 '신분증' (User-Agent)
 USER_AGENTS = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
