@@ -1,5 +1,71 @@
 {
-  "lastUpdated": "2025-11-20T10:57:26.572366",
-  "jobs": [],
-  "contests": []
+  "lastUpdated": "2025-11-20T11:21:41.839717",
+  "jobs": [
+    {
+      "title": "본문 바로가기",
+      "url": "#sri_section"
+    },
+    {
+      "title": "공고 등록",
+      "url": "https://hiring.saramin.co.kr/recruit/add"
+    },
+    {
+      "title": "후보자 리스트",
+      "url": "https://hiring.saramin.co.kr/applicant-manage"
+    },
+    {
+      "title": "공고 요청(후불형)",
+      "url": "https://hiring.saramin.co.kr/recruit/smart"
+    },
+    {
+      "title": "인적성 · 평가도구",
+      "url": "https://www.saramin.co.kr/zf_user/memcom/preview/custom-guide"
+    },
+    {
+      "title": "사람인 비즈니스",
+      "url": "https://business.saramin.co.kr?utm_source=saramin&utm_medium=referral&utm_campaign=organic&utm_content=c_drop_menu"
+    },
+    {
+      "title": "본문바로가기",
+      "url": "#"
+    },
+    {
+      "title": "공공기관채용일정",
+      "url": "https://m.incruit.com/entry/publicschedule/publicorgsched.asp"
+    },
+    {
+      "title": "일하고 싶은 기업",
+      "url": "https://m.incruit.com/entry/favoritecom/favoritecompanym.asp"
+    },
+    {
+      "title": "데이터센터",
+      "url": "https://m.incruit.com/lab/datacenter"
+    },
+    {
+      "title": "전체 전문채용관",
+      "url": "https://www.jobkorea.co.kr/Theme/Main"
+    },
+    {
+      "title": "신입·인턴 채용공고",
+      "url": "#recruitWrap"
+    },
+    {
+      "title": "취준생을 위한 콘텐츠",
+      "url": "#addTemplate_1142"
+    },
+    {
+      "title": "합격을 돕는 서비스",
+      "url": "#addTemplate_1143"
+    }
+  ],
+  "contests": [
+    {
+      "title": "캠퍼스픽 - 대학생 SNS",
+      "url": "https://www.campuspick.com/"
+    },
+    {
+      "title": "개인정보처리방침",
+      "url": "https://www.campuspick.com/page/privacy"
+    }
+  ]
 }
